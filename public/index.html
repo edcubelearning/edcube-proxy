@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proxy</title>
+  <link rel="icon" id="favicon" href="/images/default-favicon.ico">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 18px;
+      width: 300px;
+    }
+    button {
+      padding: 10px;
+      font-size: 18px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>In-Browser Proxy</h1>
+  <input type="text" id="urlInput" placeholder="Enter URL or Search term">
+  <button id="submitBtn">Go</button>
+
+  <script>
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      const input = document.getElementById('urlInput').value.trim();
+
+      // Change tab title and favicon for cloaking
+      document.title = "Google Docs";
+      document.getElementById('favicon').href = "https://ssl.gstatic.com/docs/doclist/images/infinite_arrow_favicon_5.ico";
+
+      // Prepare the POST request
+      fetch('/api/proxy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: input })
+      })
+      .then(response => response.text())
+      .then(data => {
+        // Open the proxied content in a new window
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(data);
+        newWindow.document.close();
+      })
+      .catch(err => console.error('Error:', err));
+    });
+  </script>
+</body>
+</html>
