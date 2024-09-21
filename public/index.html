@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Proxy</title>
-  <link rel="icon" id="favicon" href="/images/default-favicon.ico">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,35 +20,33 @@
       font-size: 18px;
       margin-top: 10px;
     }
+    #content {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>In-Browser Proxy</h1>
-  <input type="text" id="urlInput" placeholder="Enter URL or Search term">
+  <h1>Proxy Browser</h1>
+  <input type="text" id="urlInput" placeholder="Enter URL or search term">
   <button id="submitBtn">Go</button>
+
+  <div id="content"></div>
 
   <script>
     document.getElementById('submitBtn').addEventListener('click', () => {
       const input = document.getElementById('urlInput').value.trim();
+      const encodedUrl = encodeURIComponent(input);
 
-      // Change tab title and favicon for cloaking
-      document.title = "Google Docs";
-      document.getElementById('favicon').href = "https://ssl.gstatic.com/docs/doclist/images/infinite_arrow_favicon_5.ico";
-
-      // Prepare the POST request
-      fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: input })
-      })
-      .then(response => response.text())
-      .then(data => {
-        // Open the proxied content in a new window
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write(data);
-        newWindow.document.close();
-      })
-      .catch(err => console.error('Error:', err));
+      // Fetch the proxied content from the backend
+      fetch(`/proxy?url=${encodedUrl}`)
+        .then(response => response.text())
+        .then(data => {
+          // Load the content into the div
+          document.getElementById('content').innerHTML = data;
+        })
+        .catch(err => console.error('Error:', err));
     });
   </script>
 </body>
