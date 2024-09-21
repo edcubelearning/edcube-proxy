@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 const fetch = require('node-fetch');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Function to modify HTML content before sending to the browser
 const modifyHtml = async (html, req) => {
@@ -27,20 +27,24 @@ const modifyHtml = async (html, req) => {
     }
   });
 
-  // Additional manipulation of HTML and inline JS here if needed
   return $.html();
 };
 
 // Proxy route to handle all requests
 app.get('/proxy', async (req, res) => {
-  const { url } = req.query;
+  let { url } = req.query;
 
   if (!url) {
     return res.status(400).send('No URL provided');
   }
 
+  // Add http:// if the user didn’t provide it
+  if (!/^https?:\/\//i.test(url)) {
+    url = `http://${url}`;
+  }
+
   try {
-    const targetUrl = new URL(url.startsWith('http') ? url : `https://${url}`);
+    const targetUrl = new URL(url);
     const response = await fetch(targetUrl.href);
     const contentType = response.headers.get('content-type');
 
